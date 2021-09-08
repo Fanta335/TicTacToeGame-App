@@ -8,12 +8,12 @@ class View {
     container.innerHTML = `
       <div class="bg-dark vh-100 d-flex flex-column align-items-center justify-content-center">
         <h1 class="text-white pb-5">Tic Tac Toe Game</h1>
-        <div id='gameTable' class="col-8 bg-white d-flex flex-column align-items-center p-3">
+        <div id='gameTableContainer' class="col-8 bg-white d-flex flex-column align-items-center p-3">
         </div>
       </div>
     `;
 
-    let tableCon = container.querySelectorAll("#gameTable")[0];
+    let tableCon = container.querySelectorAll("#gameTableContainer")[0];
     tableCon.append(View.createGameTable());
 
     config.target.append(container);
@@ -22,27 +22,48 @@ class View {
   static createGameTable() {
     let container = document.createElement("table");
     container.classList.add("col-12", "table", "table-bordered", "text-center");
-    container.innerHTML = `
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>5</td>
-          <td>6</td>
-        </tr>
-        <tr>
-          <td>7</td>
-          <td>8</td>
-          <td>9</td>
-        </tr>
-      </tbody>
-    `;
+
+    container.append(View.setTableBody(3, 3));
+    return container;
+  }
+
+  static setTableBody(row, column) {
+    let container = document.createElement("tbody");
+    let rowArray = View.setRow(row);
+    rowArray.forEach((tr) => {
+      let tdArray = View.setColumn(column);
+      tdArray.forEach((td) => {
+        tr.append(td);
+      });
+
+      container.append(tr);
+    });
 
     return container;
+  }
+
+  static setRow(row) {
+    let trArray = [];
+    let count = 0;
+
+    while (count < row) {
+      trArray.push(document.createElement("tr"));
+      count++;
+    }
+
+    return trArray;
+  }
+
+  static setColumn(column) {
+    let tdArray = [];
+    let count = 0;
+
+    while (count < column) {
+      tdArray.push(document.createElement("td"));
+      count++;
+    }
+
+    return tdArray;
   }
 }
 
