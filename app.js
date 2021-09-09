@@ -11,13 +11,23 @@ class Player {
   }
 }
 
+class PlayerList {
+  userPlayer;
+  AIPlayer;
+
+  static setUserPlayer(player) {
+    this.userPlayer = player;
+  }
+
+  static setAIPlayer() {
+    this.AIPlayer = new Player("AI Player", false, "X", true);
+  }
+}
+
 class GameTable {
+  rowLength;
   currentTable;
   winPatterns;
-
-  // static setInitialTable(row, column){
-  //   this.initialTable = Array.from(Array(row*column).keys());
-  // }
 
   static initializeCurrentTable() {
     this.currentTable = {};
@@ -62,10 +72,25 @@ class GameTable {
         let position = pattern[j];
         if (GameTable.currentTable[position] === undefined) break;
         if (GameTable.currentTable[position] === player.mark) count++;
-        if(count === pattern.length) return true;
+        if (count === pattern.length) return true;
       }
     }
     return false;
+  }
+
+  static isDraw() {
+    return Object.keys(GameTable.currentTable).length === Math.pow(GameTable.rowLength, 2);
+  }
+
+  static pickUpTargetPosition() {
+    if (this.isDraw()) return;
+    return this.pickUpTargetPositionHelper();
+  }
+
+  static pickUpTargetPositionHelper() {
+    let randomPosition = Math.floor(Math.random() * Math.pow(GameTable.rowLength, 2));
+    if (this.currentTable[randomPosition] === undefined) return randomPosition;
+    else return this.pickUpTargetPositionHelper();
   }
 }
 
@@ -133,7 +158,7 @@ class View {
       td.innerHTML = "&nbsp;"; // 空白文字
       td.setAttribute("data-position", count);
       td.addEventListener("click", (event) => {
-        Controller.playerAction(player, td);
+        Controller.proceedTurn(player, td);
       });
       tdArray.push(td);
       count++;
@@ -150,18 +175,58 @@ class View {
 class Controller {
   static startGame() {
     let player = new Player("fanta", true, "O", false); // 先攻
-    let row = 3;
-    let column = 3;
+    PlayerList.setAIPlayer();
+    GameTable.rowLength = 3;
+    let row = GameTable.rowLength;
+    let column = GameTable.rowLength;
     View.createMainPage(player, row, column);
     GameTable.initializeCurrentTable();
     GameTable.setWinnerPatterns(row);
   }
 
-  static playerAction(player, target) {
-    View.printMark(player, target);
-    GameTable.recordMark(target.dataset.position, player.mark);
+  static proceedTurn(player, targetDOM) {
+    Controller.playerAction(player, targetDOM);
     let judge = GameTable.judgeWinner(player);
-    if(judge) console.log('win')
+    if (judge) {
+      alert(`${player.name} Wins!!`);
+
+      let retry = confirm("Play again?");
+      if (retry) {
+        config.target.innerHTML = "";
+        Controller.startGame();
+      }
+    } else if (GameTable.isDraw()) {
+      alert(`Draw!!`);
+
+      let retry = confirm("Play again?");
+      if (retry) {
+        config.target.innerHTML = "";
+        Controller.startGame();
+      }
+    } else Controller.AIAction();
+  }
+
+  static playerAction(player, targetDOM) {
+    View.printMark(player, targetDOM);
+    GameTable.recordMark(targetDOM.dataset.position, player.mark);
+  }
+
+  static AIAction() {
+    let targetPosition = GameTable.pickUpTargetPosition();
+    console.log(targetPosition);
+    let targetDOM = document.querySelectorAll(`[data-position="${targetPosition}"]`)[0];
+    View.printMark(PlayerList.AIPlayer, targetDOM);
+    GameTable.recordMark(targetDOM.dataset.position, PlayerList.AIPlayer.mark);
+    let judge = GameTable.judgeWinner(PlayerList.AIPlayer);
+    if (judge) {
+      alert(`${PlayerList.AIPlayer.name} Wins!!`);
+
+      let retry = confirm("Play again?");
+      if (retry) {
+        config.target.innerHTML = "";
+        Controller.startGame();
+      }
+    }
   }
 }
 
