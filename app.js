@@ -1,5 +1,6 @@
 const config = {
   target: document.getElementById("target"),
+  initialRowLength: 3,
 };
 
 class Player {
@@ -98,23 +99,76 @@ class View {
   static createMainPage(player, row, column) {
     let container = document.createElement("div");
     container.innerHTML = `
-      <div class="bg-dark vh-100 d-flex flex-column align-items-center justify-content-center">
-        <h1 class="text-white pb-5">Tic Tac Toe Game</h1>
-        <h3 class="text-white">Player Name: ${player.name}</h3>
+      <div class="vh-100 d-flex flex-column align-items-center justify-content-center">
+        <h1 class="text-white pb-3">Tic Tac Toe Game</h1>
+        <div id="optionContainer" class="row mb-4">
+        </div>
+        <h3 class="text-white pb-3">Player Name: ${player.name}</h3>
         <div id='gameTableContainer' class="col-8 bg-white d-flex flex-column align-items-center p-3">
         </div>
       </div>
     `;
 
+    let optionCon = container.querySelectorAll("#optionContainer")[0];
     let tableCon = container.querySelectorAll("#gameTableContainer")[0];
+    optionCon.append(View.createOption());
     tableCon.append(View.createGameTable(player, row, column));
 
     config.target.append(container);
   }
 
+  static createOption() {
+    let container = document.createElement("div");
+    container.innerHTML = `
+      <div class="input-group mb-3">
+        <input type="number" class="form-control" placeholder="Put number 3-10" min="3" max="10" value="3">
+        <div class="input-group-append">
+          <span class="input-group-text" id="basic-addon2">Rows</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#apply">Apply Settings</button>
+      <div class="modal fade" id="apply" tabindex="-1" role="dialog" aria-labelledby="applyLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="applyLabel">Confirm</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">Do you apply settings?</div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#replay">Replay</button>
+      <div class="modal fade" id="replay" tabindex="-1" role="dialog" aria-labelledby="replayLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="replayLabel">Confirm</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">Are your sure to Replay?</div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger">Replay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    return container;
+  }
+
   static createGameTable(player, row, column) {
     let container = document.createElement("table");
-    container.classList.add("col-12", "table", "table-bordered", "text-center");
+    container.classList.add("col-12", "table", "text-center");
 
     container.append(View.setTableBody(player, row, column));
     return container;
@@ -176,7 +230,7 @@ class Controller {
   static startGame() {
     let player = new Player("fanta", true, "O", false); // 先攻
     PlayerList.setAIPlayer();
-    GameTable.rowLength = 3;
+    GameTable.rowLength = config.initialRowLength;
     let row = GameTable.rowLength;
     let column = GameTable.rowLength;
     View.createMainPage(player, row, column);
@@ -185,6 +239,8 @@ class Controller {
   }
 
   static proceedTurn(player, targetDOM) {
+    if (targetDOM.innerHTML !== "&nbsp;") return;
+
     Controller.playerAction(player, targetDOM);
     let judge = GameTable.judgeWinner(player);
     if (judge) {
@@ -213,7 +269,6 @@ class Controller {
 
   static AIAction() {
     let targetPosition = GameTable.pickUpTargetPosition();
-    console.log(targetPosition);
     let targetDOM = document.querySelectorAll(`[data-position="${targetPosition}"]`)[0];
     View.printMark(PlayerList.AIPlayer, targetDOM);
     GameTable.recordMark(targetDOM.dataset.position, PlayerList.AIPlayer.mark);
