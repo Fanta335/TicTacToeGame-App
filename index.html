@@ -7,16 +7,87 @@
     <title>Tic Tac Toe Game</title>
     <link
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div id="target">
+      <!-- <div>
+        <div class="vh-100 d-flex flex-column align-items-center">
+          <h1 class="text-white p-3">Tic Tac Toe Game</h1>
+          <div class="row mb-4">
+            <div class="input-group mb-3">
+              <input type="number" class="form-control" placeholder="Put number 3-10" min="3" max="10" value="3">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">Rows</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Replay</button>
+
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">Are your sure to Replay?</div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Replay</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3 class="text-white pb-3">Current Player: </h3>
+          <div id="gameTableContainer" class="col-7 bg-white d-flex flex-column align-items-center p-3">
+            <table class="col-12 table text-center">
+              <tbody>
+                <tr>
+                  <td class="align-middle display-4" data-position="0">&nbsp;</td>
+                  <td class="align-middle display-4" data-position="1">&nbsp;</td>
+                  <td class="align-middle display-4" data-position="2">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td class="align-middle display-4" data-position="3">&nbsp;</td>
+                  <td class="align-middle display-4" data-position="4">&nbsp;</td>
+                  <td class="align-middle display-4" data-position="5">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td class="align-middle display-4" data-position="6">&nbsp;</td>
+                  <td class="align-middle display-4" data-position="7">&nbsp;</td>
+                  <td class="align-middle display-4" data-position="8">&nbsp;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div> -->
     </div>
 
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <!-- popper.js -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <!-- bootstrap.js -->
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
     <script src="app.js"></script>
   </body>
 </html>

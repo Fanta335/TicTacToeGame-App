@@ -1,3 +1,15 @@
-.table {
+body{
+  font-family: Futura;
+  background: radial-gradient(#121212,#086931);
+}
+
+table {
   table-layout: fixed;
+  border: 0.5rem solid;
+}
+
+td {
+  border: 0.5rem solid;
+  cursor: pointer;
+  user-select: none;
 }
