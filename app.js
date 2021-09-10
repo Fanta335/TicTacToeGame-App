@@ -39,11 +39,12 @@ class GameTable {
     this.currentTable = {};
   }
 
-  static setWinnerPatterns(row) {
+  static setWinPatterns() {
+    let row = this.rowLength;
     // row x rowの正方形のtableで計算する
     let resultPatterns = [];
 
-    // row
+    // row patterns
     let rowPattern = Array.from(Array(row).keys());
     let rowCount = 0;
     while (rowCount < row) {
@@ -51,7 +52,7 @@ class GameTable {
       rowCount++;
     }
 
-    // column
+    // column patterns
     let columnPattern = rowPattern.map((i) => i * row);
     let columnCount = 0;
     while (columnCount < row) {
@@ -59,18 +60,19 @@ class GameTable {
       columnCount++;
     }
 
-    // diagonal (always 2 patterns)
+    // diagonal patterns (2 patterns)
     resultPatterns.push(rowPattern.map((i) => i * (row + 1)));
     resultPatterns.push(rowPattern.map((i) => (i + 1) * (row - 1)));
 
     this.winPatterns = resultPatterns;
   }
 
-  static recordMark(position, mark) {
+  static addToCurrentTable(position, mark) {
     this.currentTable[position] = mark;
   }
 
-  static judgeWinner(player) {
+  // winPatternsとcurrentTableを比較していき、いずれかのpatternがcurrentTableに含まれていたらtrue
+  static checkWin(player) {
     for (let i = 0; i < this.winPatterns.length; i++) {
       let pattern = this.winPatterns[i];
       let count = 0;
@@ -84,6 +86,7 @@ class GameTable {
     return false;
   }
 
+  // currentTableがすべて埋まったら引き分け
   static isDraw() {
     return Object.keys(GameTable.currentTable).length === Math.pow(GameTable.rowLength, 2);
   }
@@ -101,7 +104,7 @@ class GameTable {
 }
 
 class View {
-  static createMainPage(row) {
+  static createMainPage() {
     let container = document.createElement("div");
     container.innerHTML = `
       <div class="vh-100 d-flex flex-column align-items-center">
@@ -117,7 +120,7 @@ class View {
     let optionCon = container.querySelectorAll("#optionContainer")[0];
     let tableCon = container.querySelectorAll("#gameTableContainer")[0];
     optionCon.append(View.createOption());
-    tableCon.append(View.createGameTable(row));
+    tableCon.append(View.createGameTable(GameTable.rowLength));
 
     config.target.append(container);
   }
@@ -194,10 +197,12 @@ class View {
 
   static setTableBody(row) {
     let container = document.createElement("tbody");
-    let rowArray = View.setRow(row);
-    rowArray.forEach((tr, index) => {
+
+    let trArray = View.setRow(row);
+    trArray.forEach((tr, index) => {
       let tdArray = View.setColumn(row);
       tdArray.forEach((td) => {
+        // 各マスに一意のdata-position属性を追加していく
         td.dataset.position = Number(td.dataset.position) + index * row;
         tr.append(td);
       });
@@ -249,62 +254,54 @@ class Controller {
     PlayerList.setUserPlayer(new Player("fanta", true, "O", false));
     PlayerList.setAIPlayer();
     GameTable.rowLength = config.defaultRowLength;
-    let row = GameTable.rowLength;
-    View.createMainPage(row);
+    View.createMainPage();
     GameTable.initializeTable();
-    GameTable.setWinnerPatterns(row);
+    GameTable.setWinPatterns();
   }
 
   static proceedTurn(targetDOM) {
     if (targetDOM.innerHTML !== "&nbsp;") return;
 
     Controller.userPlayerAction(PlayerList.userPlayer, targetDOM);
-    let judge = GameTable.judgeWinner(PlayerList.userPlayer);
+    let judge = GameTable.checkWin(PlayerList.userPlayer);
     if (judge) {
       alert(`${PlayerList.userPlayer.name} Wins!!`);
-
-      let retry = confirm("Play again?");
-      if (retry) {
-        config.target.innerHTML = "";
-        Controller.startGame();
-      }
+      Controller.askToReplay();
     } else if (GameTable.isDraw()) {
       alert(`Draw!!`);
-
-      let retry = confirm("Play again?");
-      if (retry) {
-        config.target.innerHTML = "";
-        Controller.startGame();
-      }
-    } else Controller.AIAction();
+      Controller.askToReplay();
+    } else Controller.AIPlayerAction();
   }
 
   static userPlayerAction(userPlayer, targetDOM) {
     View.printMark(userPlayer, targetDOM);
-    GameTable.recordMark(targetDOM.dataset.position, userPlayer.mark);
+    GameTable.addToCurrentTable(targetDOM.dataset.position, userPlayer.mark);
   }
 
-  static AIAction() {
+  static AIPlayerAction() {
     let targetPosition = GameTable.pickUpTargetPosition();
     let targetDOM = document.querySelectorAll(`[data-position="${targetPosition}"]`)[0];
     View.printMark(PlayerList.AIPlayer, targetDOM);
-    GameTable.recordMark(targetDOM.dataset.position, PlayerList.AIPlayer.mark);
-    let judge = GameTable.judgeWinner(PlayerList.AIPlayer);
+    GameTable.addToCurrentTable(targetDOM.dataset.position, PlayerList.AIPlayer.mark);
+    let judge = GameTable.checkWin(PlayerList.AIPlayer);
     if (judge) {
       alert(`${PlayerList.AIPlayer.name} Wins!!`);
-
-      let retry = confirm("Play again?");
-      if (retry) {
-        config.target.innerHTML = "";
-        Controller.startGame();
-      }
+      Controller.askToReplay();
+    } else if (GameTable.isDraw()) {
+      alert(`Draw!!`);
+      Controller.askToReplay();
     }
+  }
+
+  static askToReplay() {
+    let replay = confirm("Play again?");
+    if (replay) Controller.replayAction();
   }
 
   static applyOptionAction(newRowLength) {
     GameTable.rowLength = newRowLength;
     GameTable.initializeTable();
-    GameTable.setWinnerPatterns(GameTable.rowLength);
+    GameTable.setWinPatterns(GameTable.rowLength);
 
     let gameTableCon = document.getElementById("gameTableContainer");
     gameTableCon.innerHTML = "";
@@ -313,7 +310,7 @@ class Controller {
 
   static replayAction() {
     GameTable.initializeTable();
-    GameTable.setWinnerPatterns(GameTable.rowLength);
+    GameTable.setWinPatterns(GameTable.rowLength);
 
     let gameTableCon = document.getElementById("gameTableContainer");
     gameTableCon.innerHTML = "";
