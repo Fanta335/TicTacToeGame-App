@@ -1,6 +1,6 @@
 const config = {
   target: document.getElementById("target"),
-  initialRowLength: 3,
+  defaultRowLength: 3,
 };
 
 class Player {
@@ -96,12 +96,12 @@ class GameTable {
 }
 
 class View {
-  static createMainPage(player, row, column) {
+  static createMainPage(player, row) {
     let container = document.createElement("div");
     container.innerHTML = `
-      <div class="vh-100 d-flex flex-column align-items-center justify-content-center">
-        <h1 class="text-white pb-3">Tic Tac Toe Game</h1>
-        <div id="optionContainer" class="row mb-4">
+      <div class="vh-100 d-flex flex-column align-items-center">
+        <h1 class="text-white p-3">Tic Tac Toe Game</h1>
+        <div id="optionContainer" class="row pb-4">
         </div>
         <h3 class="text-white pb-3">Player Name: ${player.name}</h3>
         <div id='gameTableContainer' class="col-8 bg-white d-flex flex-column align-items-center p-3">
@@ -112,7 +112,7 @@ class View {
     let optionCon = container.querySelectorAll("#optionContainer")[0];
     let tableCon = container.querySelectorAll("#gameTableContainer")[0];
     optionCon.append(View.createOption());
-    tableCon.append(View.createGameTable(player, row, column));
+    tableCon.append(View.createGameTable(player, row));
 
     config.target.append(container);
   }
@@ -126,7 +126,7 @@ class View {
           <span class="input-group-text" id="basic-addon2">Rows</span>
         </div>
       </div>
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#apply">Apply Settings</button>
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#apply">Apply Option</button>
       <div class="modal fade" id="apply" tabindex="-1" role="dialog" aria-labelledby="applyLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -136,7 +136,7 @@ class View {
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">Do you apply settings?</div>
+            <div class="modal-body">Do you apply option?</div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary">Apply</button>
@@ -166,21 +166,21 @@ class View {
     return container;
   }
 
-  static createGameTable(player, row, column) {
+  static createGameTable(player, row) {
     let container = document.createElement("table");
     container.classList.add("col-12", "table", "text-center");
 
-    container.append(View.setTableBody(player, row, column));
+    container.append(View.setTableBody(player, row));
     return container;
   }
 
-  static setTableBody(player, row, column) {
+  static setTableBody(player, row) {
     let container = document.createElement("tbody");
     let rowArray = View.setRow(row);
     rowArray.forEach((tr, index) => {
-      let tdArray = View.setColumn(player, column);
+      let tdArray = View.setColumn(player, row);
       tdArray.forEach((td) => {
-        td.dataset.position = Number(td.dataset.position) + index * column;
+        td.dataset.position = Number(td.dataset.position) + index * row;
         tr.append(td);
       });
 
@@ -230,10 +230,9 @@ class Controller {
   static startGame() {
     let player = new Player("fanta", true, "O", false); // 先攻
     PlayerList.setAIPlayer();
-    GameTable.rowLength = config.initialRowLength;
+    GameTable.rowLength = config.defaultRowLength;
     let row = GameTable.rowLength;
-    let column = GameTable.rowLength;
-    View.createMainPage(player, row, column);
+    View.createMainPage(player, row);
     GameTable.initializeCurrentTable();
     GameTable.setWinnerPatterns(row);
   }
@@ -283,6 +282,10 @@ class Controller {
       }
     }
   }
+
+  // static applyOptionAction(option){
+
+  // }
 }
 
 Controller.startGame();
