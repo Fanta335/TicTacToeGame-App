@@ -96,14 +96,14 @@ class GameTable {
 }
 
 class View {
-  static createMainPage(player, row) {
+  static createMainPage(row) {
     let container = document.createElement("div");
     container.innerHTML = `
       <div class="vh-100 d-flex flex-column align-items-center">
         <h1 class="text-white p-3">Tic Tac Toe Game</h1>
         <div id="optionContainer" class="row pb-4">
         </div>
-        <h3 class="text-white pb-3">Player Name: ${player.name}</h3>
+        <h3 class="text-white pb-3">Player Name: ${PlayerList.userPlayer.name}</h3>
         <div id='gameTableContainer' class="col-8 bg-white d-flex flex-column align-items-center p-3">
         </div>
       </div>
@@ -112,7 +112,7 @@ class View {
     let optionCon = container.querySelectorAll("#optionContainer")[0];
     let tableCon = container.querySelectorAll("#gameTableContainer")[0];
     optionCon.append(View.createOption());
-    tableCon.append(View.createGameTable(player, row));
+    tableCon.append(View.createGameTable(row));
 
     config.target.append(container);
   }
@@ -166,19 +166,19 @@ class View {
     return container;
   }
 
-  static createGameTable(player, row) {
+  static createGameTable(row) {
     let container = document.createElement("table");
     container.classList.add("col-12", "table", "text-center");
 
-    container.append(View.setTableBody(player, row));
+    container.append(View.setTableBody(row));
     return container;
   }
 
-  static setTableBody(player, row) {
+  static setTableBody(row) {
     let container = document.createElement("tbody");
     let rowArray = View.setRow(row);
     rowArray.forEach((tr, index) => {
-      let tdArray = View.setColumn(player, row);
+      let tdArray = View.setColumn(row);
       tdArray.forEach((td) => {
         td.dataset.position = Number(td.dataset.position) + index * row;
         tr.append(td);
@@ -202,7 +202,7 @@ class View {
     return trArray;
   }
 
-  static setColumn(player, column) {
+  static setColumn(column) {
     let tdArray = [];
     let count = 0;
 
@@ -212,7 +212,7 @@ class View {
       td.innerHTML = "&nbsp;"; // 空白文字
       td.setAttribute("data-position", count);
       td.addEventListener("click", (event) => {
-        Controller.proceedTurn(player, td);
+        Controller.proceedTurn(td);
       });
       tdArray.push(td);
       count++;
@@ -228,22 +228,22 @@ class View {
 
 class Controller {
   static startGame() {
-    let player = new Player("fanta", true, "O", false); // 先攻
+    PlayerList.setUserPlayer(new Player("fanta", true, "O", false))
     PlayerList.setAIPlayer();
     GameTable.rowLength = config.defaultRowLength;
     let row = GameTable.rowLength;
-    View.createMainPage(player, row);
+    View.createMainPage(row);
     GameTable.initializeCurrentTable();
     GameTable.setWinnerPatterns(row);
   }
 
-  static proceedTurn(player, targetDOM) {
+  static proceedTurn(targetDOM) {
     if (targetDOM.innerHTML !== "&nbsp;") return;
 
-    Controller.playerAction(player, targetDOM);
-    let judge = GameTable.judgeWinner(player);
+    Controller.userPlayerAction(PlayerList.userPlayer, targetDOM);
+    let judge = GameTable.judgeWinner(PlayerList.userPlayer);
     if (judge) {
-      alert(`${player.name} Wins!!`);
+      alert(`${PlayerList.userPlayer.name} Wins!!`);
 
       let retry = confirm("Play again?");
       if (retry) {
@@ -261,9 +261,9 @@ class Controller {
     } else Controller.AIAction();
   }
 
-  static playerAction(player, targetDOM) {
-    View.printMark(player, targetDOM);
-    GameTable.recordMark(targetDOM.dataset.position, player.mark);
+  static userPlayerAction(userPlayer, targetDOM) {
+    View.printMark(userPlayer, targetDOM);
+    GameTable.recordMark(targetDOM.dataset.position, userPlayer.mark);
   }
 
   static AIAction() {
@@ -284,7 +284,10 @@ class Controller {
   }
 
   // static applyOptionAction(option){
-
+  //   let newRowLength = option.rowLength;
+  //   let gameTableCon = document.getElementById('gameTableContainer');
+  //   gameTableCon.innerHTML = '';
+  //   gameTableCon.append(View.createGameTable(player, newRowLength));
   // }
 }
 
