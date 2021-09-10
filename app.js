@@ -30,8 +30,9 @@ class GameTable {
   currentTable;
   winPatterns;
 
-  static initializeCurrentTable() {
+  static initializeTable() {
     this.currentTable = {};
+    this.winPatterns = [];
   }
 
   static setWinnerPatterns(row) {
@@ -121,9 +122,9 @@ class View {
     let container = document.createElement("div");
     container.innerHTML = `
       <div class="input-group mb-3">
-        <input type="number" class="form-control" placeholder="Put number 3-10" min="3" max="10" value="3">
+        <input id="rowInput" type="number" class="form-control" placeholder="Put number 3-10" min="3" max="10" value="3">
         <div class="input-group-append">
-          <span class="input-group-text" id="basic-addon2">Rows</span>
+          <span class="input-group-text">Rows</span>
         </div>
       </div>
       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#apply">Apply Option</button>
@@ -139,7 +140,7 @@ class View {
             <div class="modal-body">Do you apply option?</div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Apply</button>
+              <button id="confirmApplyButton" type="button" class="btn btn-primary">Apply</button>
             </div>
           </div>
         </div>
@@ -163,6 +164,13 @@ class View {
         </div>
       </div>
     `;
+
+    let rowInput = container.querySelectorAll("#rowInput")[0];
+    let confirmApplyButton = container.querySelectorAll("#confirmApplyButton")[0];
+    confirmApplyButton.addEventListener("click", (event) => {
+      Controller.applyOptionAction(Number(rowInput.value));
+    });
+
     return container;
   }
 
@@ -202,11 +210,11 @@ class View {
     return trArray;
   }
 
-  static setColumn(column) {
+  static setColumn(row) {
     let tdArray = [];
     let count = 0;
 
-    while (count < column) {
+    while (count < row) {
       let td = document.createElement("td");
       td.classList.add("align-middle", "display-4");
       td.innerHTML = "&nbsp;"; // 空白文字
@@ -228,12 +236,12 @@ class View {
 
 class Controller {
   static startGame() {
-    PlayerList.setUserPlayer(new Player("fanta", true, "O", false))
+    PlayerList.setUserPlayer(new Player("fanta", true, "O", false));
     PlayerList.setAIPlayer();
     GameTable.rowLength = config.defaultRowLength;
     let row = GameTable.rowLength;
     View.createMainPage(row);
-    GameTable.initializeCurrentTable();
+    GameTable.initializeTable();
     GameTable.setWinnerPatterns(row);
   }
 
@@ -283,12 +291,15 @@ class Controller {
     }
   }
 
-  // static applyOptionAction(option){
-  //   let newRowLength = option.rowLength;
-  //   let gameTableCon = document.getElementById('gameTableContainer');
-  //   gameTableCon.innerHTML = '';
-  //   gameTableCon.append(View.createGameTable(player, newRowLength));
-  // }
+  static applyOptionAction(newRowLength) {
+    GameTable.rowLength = newRowLength;
+    GameTable.initializeTable();
+    GameTable.setWinnerPatterns(GameTable.rowLength);
+
+    let gameTableCon = document.getElementById("gameTableContainer");
+    gameTableCon.innerHTML = "";
+    gameTableCon.append(View.createGameTable(newRowLength));
+  }
 }
 
 Controller.startGame();
