@@ -285,7 +285,7 @@ class Controller {
     GameTable.addToCurrentTable(targetDOM.dataset.position, PlayerList.AIPlayer.mark);
     let judge = GameTable.checkWin(PlayerList.AIPlayer);
     if (judge) {
-      alert(`${PlayerList.AIPlayer.name} Wins!!`);
+      alert(`${PlayerList.userPlayer.name} Lose...`);
       Controller.askToReplay();
     } else if (GameTable.isDraw()) {
       alert(`Draw!!`);
