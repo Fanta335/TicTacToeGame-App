@@ -35,6 +35,10 @@ class GameTable {
     this.winPatterns = [];
   }
 
+  static initializeCurrentTable() {
+    this.currentTable = {};
+  }
+
   static setWinnerPatterns(row) {
     // row x rowの正方形のtableで計算する
     let resultPatterns = [];
@@ -140,7 +144,7 @@ class View {
             <div class="modal-body">Do you apply option?</div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button id="confirmApplyButton" type="button" class="btn btn-primary">Apply</button>
+              <button id="confirmApplyButton" type="button" class="btn btn-primary" data-dismiss="modal">Apply</button>
             </div>
           </div>
         </div>
@@ -158,7 +162,7 @@ class View {
             <div class="modal-body">Are your sure to Replay?</div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-danger">Replay</button>
+              <button id="confirmReplayButton" type="button" class="btn btn-danger" data-dismiss="modal">Replay</button>
             </div>
           </div>
         </div>
@@ -167,8 +171,14 @@ class View {
 
     let rowInput = container.querySelectorAll("#rowInput")[0];
     let confirmApplyButton = container.querySelectorAll("#confirmApplyButton")[0];
+    let confirmReplayButton = container.querySelectorAll("#confirmReplayButton")[0];
+
     confirmApplyButton.addEventListener("click", (event) => {
       Controller.applyOptionAction(Number(rowInput.value));
+    });
+
+    confirmReplayButton.addEventListener("click", (event) => {
+      Controller.replayAction();
     });
 
     return container;
@@ -299,6 +309,15 @@ class Controller {
     let gameTableCon = document.getElementById("gameTableContainer");
     gameTableCon.innerHTML = "";
     gameTableCon.append(View.createGameTable(newRowLength));
+  }
+
+  static replayAction() {
+    GameTable.initializeTable();
+    GameTable.setWinnerPatterns(GameTable.rowLength);
+
+    let gameTableCon = document.getElementById("gameTableContainer");
+    gameTableCon.innerHTML = "";
+    gameTableCon.append(View.createGameTable(GameTable.rowLength));
   }
 }
 
