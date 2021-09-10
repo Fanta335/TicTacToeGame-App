@@ -4,9 +4,8 @@ const config = {
 };
 
 class Player {
-  constructor(name, turn, mark, isAI) {
+  constructor(name, mark, isAI) {
     this.name = name;
-    this.isTurn = turn;
     this.mark = mark;
     this.isAI = isAI;
   }
@@ -21,7 +20,7 @@ class PlayerList {
   }
 
   static setAIPlayer() {
-    this.AIPlayer = new Player("AI Player", false, "X", true);
+    this.AIPlayer = new Player("AI Player", "X", true);
   }
 }
 
@@ -129,7 +128,7 @@ class View {
     let container = document.createElement("div");
     container.innerHTML = `
       <div class="input-group mb-3">
-        <input id="rowInput" type="number" class="form-control" placeholder="Put number 3-10" min="3" max="10" value="3">
+        <input id="rowInput" type="number" class="form-control" placeholder="Put num 3-10" min="3" max="10" value="3">
         <div class="input-group-append">
           <span class="input-group-text">Rows</span>
         </div>
@@ -247,11 +246,20 @@ class View {
   static printMark(player, target) {
     if (target.innerHTML === "&nbsp;") target.innerHTML = player.mark;
   }
+
+  static createPopupWindow() {
+    let container = document.createElement("div");
+    container.classList.add("popupWindow");
+    container.innerHTML = `
+      <h1>POP UP WINDOW!</h1>
+    `;
+    config.target.append(container);
+  }
 }
 
 class Controller {
   static startGame() {
-    PlayerList.setUserPlayer(new Player("fanta", true, "O", false));
+    PlayerList.setUserPlayer(new Player("Test User", "O", false));
     PlayerList.setAIPlayer();
     GameTable.rowLength = config.defaultRowLength;
     View.createMainPage();
@@ -259,10 +267,10 @@ class Controller {
     GameTable.setWinPatterns();
   }
 
-  static proceedTurn(targetDOM) {
-    if (targetDOM.innerHTML !== "&nbsp;") return;
+  static proceedTurn(taragetElement) {
+    if (taragetElement.innerHTML !== "&nbsp;") return;
 
-    Controller.userPlayerAction(PlayerList.userPlayer, targetDOM);
+    Controller.userPlayerAction(PlayerList.userPlayer, taragetElement);
     let judge = GameTable.checkWin(PlayerList.userPlayer);
     if (judge) {
       alert(`${PlayerList.userPlayer.name} Wins!!`);
@@ -273,16 +281,16 @@ class Controller {
     } else Controller.AIPlayerAction();
   }
 
-  static userPlayerAction(userPlayer, targetDOM) {
-    View.printMark(userPlayer, targetDOM);
-    GameTable.addToCurrentTable(targetDOM.dataset.position, userPlayer.mark);
+  static userPlayerAction(userPlayer, taragetElement) {
+    View.printMark(userPlayer, taragetElement);
+    GameTable.addToCurrentTable(taragetElement.dataset.position, userPlayer.mark);
   }
 
   static AIPlayerAction() {
     let targetPosition = GameTable.pickUpTargetPosition();
-    let targetDOM = document.querySelectorAll(`[data-position="${targetPosition}"]`)[0];
-    View.printMark(PlayerList.AIPlayer, targetDOM);
-    GameTable.addToCurrentTable(targetDOM.dataset.position, PlayerList.AIPlayer.mark);
+    let taragetElement = document.querySelectorAll(`[data-position="${targetPosition}"]`)[0];
+    View.printMark(PlayerList.AIPlayer, taragetElement);
+    GameTable.addToCurrentTable(taragetElement.dataset.position, PlayerList.AIPlayer.mark);
     let judge = GameTable.checkWin(PlayerList.AIPlayer);
     if (judge) {
       alert(`${PlayerList.userPlayer.name} Lose...`);
@@ -299,6 +307,10 @@ class Controller {
   }
 
   static applyOptionAction(newRowLength) {
+    if (newRowLength < 3 || newRowLength > 10) {
+      alert("Invalid row length. Input number 3-10.");
+      return;
+    }
     GameTable.rowLength = newRowLength;
     GameTable.initializeTable();
     GameTable.setWinPatterns(GameTable.rowLength);
